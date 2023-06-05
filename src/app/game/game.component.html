@@ -1,0 +1,8 @@
+<div class="game-playground">
+
+    <div class="card-stack">
+        <img [ngStyle]="{'right.px': i * 5}" *ngFor="let c of [0,1,2,3]; let i = index;" src="/assets/img/cards/card_cover.png">
+        <img (click)="takeNewCard()" class="top-card" style="right: 25px" src="/assets/img/cards/card_cover.png">
+        <img (click)="takeNewCard()" *ngIf="takeNewCardAnimation" class="take-new-card" style="right: 25px" src="/assets/img/cards/ace_1.png">
+    </div>
+</div>
