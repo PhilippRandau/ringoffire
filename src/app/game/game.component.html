@@ -6,14 +6,14 @@
 
     <div class="card-stack">
         <img [ngStyle]="{'right.px': i * 5}" *ngFor="let c of [0,1,2,3]; let i = index;"
-            src="/assets/img/cards/card_cover.png">
-        <img (click)="takeNewCard()" class="top-card" style="right: 25px" src="/assets/img/cards/card_cover.png">
+            src="assets/img/cards/card_cover.png">
+        <img (click)="takeNewCard()" class="top-card" style="right: 25px" src="assets/img/cards/card_cover.png">
         <!-- Stack for played cards -->
         <img (click)="takeNewCard()" *ngFor="let card of game.playedCards;" class="played-card"
-            src="/assets/img/cards/{{ card }}.png">
+            src="assets/img/cards/{{ card }}.png">
         <!-- Current new card animation -->
         <img (click)="takeNewCard()" *ngIf="takeNewCardAnimation" class="take-new-card" style="right: 25px"
-            src="/assets/img/cards/{{ currentCard }}.png">
+            src="assets/img/cards/{{ currentCard }}.png">
 
     </div>
 </div>
