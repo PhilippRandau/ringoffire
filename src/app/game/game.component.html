@@ -1,8 +1,25 @@
+<app-player [ngStyle]="{'top.px': 250 + (i * 90)}" *ngFor="let player of game.players; let i = index;" [name]="player" [playerNum]="i" [playerActive]="i == game.currentPlayer"
+    class="player-position">
+
+</app-player>
 <div class="game-playground">
 
     <div class="card-stack">
-        <img [ngStyle]="{'right.px': i * 5}" *ngFor="let c of [0,1,2,3]; let i = index;" src="/assets/img/cards/card_cover.png">
+        <img [ngStyle]="{'right.px': i * 5}" *ngFor="let c of [0,1,2,3]; let i = index;"
+            src="/assets/img/cards/card_cover.png">
         <img (click)="takeNewCard()" class="top-card" style="right: 25px" src="/assets/img/cards/card_cover.png">
-        <img (click)="takeNewCard()" *ngIf="takeNewCardAnimation" class="take-new-card" style="right: 25px" src="/assets/img/cards/ace_1.png">
+        <!-- Stack for played cards -->
+        <img (click)="takeNewCard()" *ngFor="let card of game.playedCards;" class="played-card"
+            src="/assets/img/cards/{{ card }}.png">
+        <!-- Current new card animation -->
+        <img (click)="takeNewCard()" *ngIf="takeNewCardAnimation" class="take-new-card" style="right: 25px"
+            src="/assets/img/cards/{{ currentCard }}.png">
+
     </div>
 </div>
+
+<app-game-info [card]="currentCard" class="info-card"></app-game-info>
+
+<button mat-fab (click)="openDialog()" color="primary" class="button-add">
+    <mat-icon >add</mat-icon>
+  </button>
