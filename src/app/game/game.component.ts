@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Game } from 'src/models/game';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
+import { Firestore, collection, collectionData, doc, docData, updateDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-game',
@@ -9,27 +12,48 @@ import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit {
-  takeNewCardAnimation = false;
-  currentCard: string = '';
   game: Game = new Game();
+  firestore: Firestore = inject(Firestore);
+  games$: Observable<any[]>;
+  gameRoute: any;
+  gameId!: string;
 
-  constructor(public dialog: MatDialog) { }
+  constructor(private route: ActivatedRoute, public dialog: MatDialog) {
+    const games = collection(this.firestore, `games`);
+    this.games$ = collectionData(games);
+  }
+
 
   ngOnInit(): void {
     this.newGame();
+    this.route.params.subscribe((params) => {
+      this.gameId = params['id'];
+      docData(doc(this.firestore, `games/${this.gameId}`)).subscribe((game) => {
+        this.game.currentPlayer = game['currentPlayer'];
+        this.game.playedCards = game['playedCards'];
+        this.game.players = game['players'];
+        this.game.stack = game['stack'];
+        this.game.currentCard = game['currentCard'];
+        this.game.takeNewCardAnimation = game['takeNewCardAnimation'];
+      })
+    })
   }
 
   takeNewCard() {
-    if (!this.takeNewCardAnimation && this.game.stack.length > 0) {
-      this.takeNewCardAnimation = true;
-      this.currentCard = this.game.stack.pop()!;
+    if (!this.game.takeNewCardAnimation && this.game.stack.length > 0) {
+      this.game.takeNewCardAnimation = true;
+      this.game.currentCard = this.game.stack.pop()!;
+      
 
       this.game.currentPlayer++;
       this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
+      this.updateGame();
       setTimeout(() => {
-        this.takeNewCardAnimation = false;
-        this.game.playedCards.push(this.currentCard);
+        this.game.takeNewCardAnimation = false;
+        this.game.playedCards.push(this.game.currentCard);
+        this.updateGame();
       }, 1250);
+      
     }
 
   }
@@ -40,6 +64,7 @@ export class GameComponent implements OnInit {
     dialogRef.afterClosed().subscribe((name: string) => {
       if (name && name.length > 0) {
         this.game.players.push(name);
+        this.updateGame();
       }
     });
   }
@@ -47,6 +72,9 @@ export class GameComponent implements OnInit {
 
   newGame() {
     this.game = new Game();
-    console.log(this.game);
+  }
+
+  updateGame() {
+    updateDoc(doc(this.firestore, `games/${this.gameId}`), this.game.toJson())
   }
 }
